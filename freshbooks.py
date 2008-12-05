@@ -224,10 +224,18 @@ class BaseObject(object):
             val = None
             if elem.firstChild:
                 val = elem.firstChild.nodeValue
-                
+                # HACK:  find another way to detect arrays, probably
+                # based on a list of elements instead of a textnode
+                if elem.nodeName == 'lines':
+                    val = []
+                    for item in [node for node in elem.childNodes if node.nodeType == node.ELEMENT_NODE]:
+                        c = eval(item.nodeName.capitalize())
+                        if c:
+                            val.append(c._new_from_xml(item))
+                        
                 # if there is typing information supplied by 
                 # the child class then use that
-                if cls.TYPE_MAPPINGS.has_key(elem.nodeName):
+                elif cls.TYPE_MAPPINGS.has_key(elem.nodeName):
                     val = \
                         cls.MAPPING_FUNCTIONS[\
                             cls.TYPE_MAPPINGS[elem.nodeName]](val)
@@ -305,6 +313,68 @@ class Client(BaseObject):
         
         return result
   
+#-----------------------------------------------#
+# Invoice
+#-----------------------------------------------#      
+class Invoice(BaseObject):
+    '''
+    The Invoice object
+    '''
+
+    TYPE_MAPPINGS = {'invoice_id' : 'int', 'client_id' : 'int',
+        'po_number' : 'float', 'discount' : 'float', 'amount' : 'float'}
+
+    def __init__(self):
+        '''
+        The constructor is where we initially create the
+        attributes for this class
+        '''
+        self.name = 'invoice'
+        for att in ('invoice_id', 'client_id', 'number', 'date', 'po_number',
+      'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 'p_city','p_state', 'p_country', 'p_code', 'amount', 'lines', 'discount', 'status', 'notes', 'url'):
+            setattr(self, att, None)
+        self.lines = []
+        self.links = []
+
+    @classmethod
+    def get(cls, invoice_id):
+        '''
+        Get a single object from the API
+        '''
+        resp = call_api('invoice.get', {'invoice_id' : invoice_id})
+
+        if resp.success:
+            invoices = resp.doc.getElementsByTagName('invoice')
+            if invoices:
+                return Invoice._new_from_xml(invoices[0])
+
+        return None
+
+    @classmethod
+    def list(cls, options = {}):
+        '''  '''
+        resp = call_api('invoice.list', options)
+        result = None
+        if (resp.success):
+            result = [Invoice._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('invoice')]
+
+        return result
+        
+class Line(BaseObject):
+    TYPE_MAPPINGS = {'unit_cost' : 'float', 'quantity' : 'int',
+        'tax1_percent' : 'float', 'tax2_percent' : 'float', 'amount' : 'float'}
+
+    def __init__(self):
+        '''
+        The constructor is where we initially create the
+        attributes for this class
+        '''
+        self.name = 'line'
+        for att in ('name', 'description', 'unit_cost', 'quantity', 'tax1_name',
+        'tax2_name', 'tax1_percent', 'tax2_percent', 'amount'):
+            setattr(self, att, None)
+    
+
 #-----------------------------------------------#
 # Staff
 #-----------------------------------------------#      
