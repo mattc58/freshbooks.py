@@ -262,6 +262,9 @@ class BaseObject(object):
         return root            
     
  
+#-----------------------------------------------#
+# Client
+#-----------------------------------------------#      
 class Client(BaseObject):
     '''
     The Client object
@@ -301,7 +304,10 @@ class Client(BaseObject):
             result = [Client._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('client')]
         
         return result
-        
+  
+#-----------------------------------------------#
+# Staff
+#-----------------------------------------------#      
 class Staff(BaseObject):
     '''
     The Staff object
