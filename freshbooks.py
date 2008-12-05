@@ -347,7 +347,6 @@ class Staff(BaseObject):
         resp = call_api('staff.list', options)
         result = None
         if (resp.success):
-            print resp.doc.toxml()
             result = [Staff._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('member')]
 
         return result
