@@ -481,6 +481,54 @@ class Payment(BaseObject):
 
         return result
 
+#-----------------------------------------------#
+# Recurring
+#-----------------------------------------------#      
+class Recurring(BaseObject):
+    '''
+    The Recurring object
+    '''
+
+    TYPE_MAPPINGS = {'recurring_id' : 'int', 'client_id' : 'int',
+        'po_number' : 'int', 'discount' : 'float', 'amount' : 'float',
+        'occurrences' : 'int', 'date' : 'datetime'}
+
+    def __init__(self):
+        '''
+        The constructor is where we initially create the
+        attributes for this class
+        '''
+        self.name = 'recurring'
+        for att in ('recurring_id', 'client_id', 'date', 'po_number',
+      'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 'p_city','p_state', 'p_country', 'p_code', 'amount', 'lines', 'discount', 'status', 'notes', 'occurrences', 'frequency', 'send_email', 'send_snail_mail'):
+            setattr(self, att, None)
+        self.lines = []
+
+    @classmethod
+    def get(cls, recurring_id):
+        '''
+        Get a single object from the API
+        '''
+        resp = call_api('recurring.get', {'recurring_id' : recurring_id})
+
+        if resp.success:
+            print resp
+            recurrings = resp.doc.getElementsByTagName('recurring')
+            if recurrings:
+                return Recurring._new_from_xml(recurrings[0])
+
+        return None
+
+    @classmethod
+    def list(cls, options = {}):
+        '''  '''
+        resp = call_api('recurring.list', options)
+        result = None
+        if (resp.success):
+            print resp
+            result = [Recurring._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('recurring')]
+
+        return result
     
 
 #-----------------------------------------------#
