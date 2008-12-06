@@ -500,7 +500,7 @@ class Recurring(BaseObject):
         '''
         self.name = 'recurring'
         for att in ('recurring_id', 'client_id', 'date', 'po_number',
-      'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 'p_city','p_state', 'p_country', 'p_code', 'amount', 'lines', 'discount', 'status', 'notes', 'occurrences', 'frequency', 'send_email', 'send_snail_mail'):
+      'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 'p_city','p_state', 'p_country', 'p_code', 'amount', 'lines', 'discount', 'status', 'notes', 'occurrences', 'frequency', 'stopped', 'send_email', 'send_snail_mail'):
             setattr(self, att, None)
         self.lines = []
 
@@ -512,7 +512,6 @@ class Recurring(BaseObject):
         resp = call_api('recurring.get', {'recurring_id' : recurring_id})
 
         if resp.success:
-            print resp
             recurrings = resp.doc.getElementsByTagName('recurring')
             if recurrings:
                 return Recurring._new_from_xml(recurrings[0])
@@ -525,11 +524,58 @@ class Recurring(BaseObject):
         resp = call_api('recurring.list', options)
         result = None
         if (resp.success):
-            print resp
             result = [Recurring._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('recurring')]
 
         return result
     
+#-----------------------------------------------#
+# Project
+#-----------------------------------------------#      
+class Project(BaseObject):
+    '''
+    The Project object
+    '''
+
+    TYPE_MAPPINGS = {'project_id' : 'int', 'client_id' : 'int',
+        'rate' : 'float'}
+
+    def __init__(self):
+        '''
+        The constructor is where we initially create the
+        attributes for this class
+        '''
+        self.name = 'project'
+        for att in ('project_id', 'client_id', 'name', 'bill_method','rate',
+            'description', 'tasks'):
+            setattr(self, att, None)
+        self.tasks = []
+
+    @classmethod
+    def get(cls, project_id):
+        '''
+        Get a single object from the API
+        '''
+        resp = call_api('project.get', {'project_id' : project_id})
+
+        if resp.success:
+            projects = resp.doc.getElementsByTagName('project')
+            print resp
+            if projects:
+                return Project._new_from_xml(projects[0])
+
+        return None
+
+    @classmethod
+    def list(cls, options = {}):
+        '''  '''
+        resp = call_api('project.list', options)
+        result = None
+        if (resp.success):
+            print resp
+            result = [Project._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('project')]
+
+        return result
+
 
 #-----------------------------------------------#
 # Staff
