@@ -50,8 +50,7 @@ USAGE:
     
 """
 
-import sys
-import os
+import sys, os, datetime
 import urllib, urllib2
 import xml.dom.minidom as xml_lib
 
@@ -162,6 +161,15 @@ class Response(object):
         The constructor, taking in the xml as the source
         '''
         self._doc = xml_lib.parseString(xml_raw)
+        
+    def __repr__(self):
+        '''
+        Print the Response and show the XML document
+        '''
+        s = "Response: success: %s, error_message: %s" % \
+            (self.success,self.error_message)
+        s += "\nResponse Document: \n%s" % self.doc.toxml()
+        return s
       
     @property  
     def doc(self):
@@ -207,7 +215,9 @@ class BaseObject(object):
     # anonymous functions to do the conversions on type
     MAPPING_FUNCTIONS = {
         'int' : lambda val: int(val),
-        'float' : lambda val: float(val)
+        'float' : lambda val: float(val),
+        'datetime' : lambda val: datetime.datetime.strptime(val, 
+            '%Y-%m-%d %H:%M:%S') if val != '0000-00-00 00:00:00' else val
     }
 
     @classmethod
@@ -322,7 +332,8 @@ class Invoice(BaseObject):
     '''
 
     TYPE_MAPPINGS = {'invoice_id' : 'int', 'client_id' : 'int',
-        'po_number' : 'float', 'discount' : 'float', 'amount' : 'float'}
+        'po_number' : 'float', 'discount' : 'float', 'amount' : 'float',
+        'date' : 'datetime'}
 
     def __init__(self):
         '''
@@ -360,6 +371,9 @@ class Invoice(BaseObject):
 
         return result
         
+#-----------------------------------------------#
+# Line--really just a part of Invoice
+#-----------------------------------------------#      
 class Line(BaseObject):
     TYPE_MAPPINGS = {'unit_cost' : 'float', 'quantity' : 'float',
         'tax1_percent' : 'float', 'tax2_percent' : 'float', 'amount' : 'float'}
@@ -420,6 +434,53 @@ class Item(BaseObject):
 
         return result
 
+#-----------------------------------------------#
+# Payment
+#-----------------------------------------------#      
+class Payment(BaseObject):
+    '''
+    The Payment object
+    '''
+
+    TYPE_MAPPINGS = {'client_id' : 'int', 'invoice_id' : 'int',
+        'amount' : 'float', 'date' : 'datetime'}
+
+    def __init__(self):
+        '''
+        The constructor is where we initially create the
+        attributes for this class
+        '''
+        self.name = 'payment'
+        for att in ('payment_id', 'client_id', 'invoice_id', 'date',
+        'amount', 'type', 'notes'):
+            setattr(self, att, None)
+
+    @classmethod
+    def get(cls, payment_id):
+        '''
+        Get a single object from the API
+        '''
+        resp = call_api('payment.get', {'payment_id' : payment_id})
+
+        if resp.success:
+            print resp
+            payments = resp.doc.getElementsByTagName('payment')
+            if payments:
+                return Payment._new_from_xml(payments[0])
+
+        return None
+
+    @classmethod
+    def list(cls, options = {}):
+        '''  '''
+        resp = call_api('payment.list', options)
+        result = None
+        if (resp.success):
+            print resp
+            result = [Payment._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('payment')]
+
+        return result
+
     
 
 #-----------------------------------------------#
@@ -430,7 +491,9 @@ class Staff(BaseObject):
     The Staff object
     '''
 
-    TYPE_MAPPINGS = {'staff_id' : 'int'}
+    TYPE_MAPPINGS = {'staff_id' : 'int', 'rate' : 'float',
+        'last_login' : 'datetime',
+        'signup_date' : 'datetime'}
 
     def __init__(self):
         '''
