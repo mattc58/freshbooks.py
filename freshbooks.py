@@ -361,7 +361,7 @@ class Invoice(BaseObject):
         return result
         
 class Line(BaseObject):
-    TYPE_MAPPINGS = {'unit_cost' : 'float', 'quantity' : 'int',
+    TYPE_MAPPINGS = {'unit_cost' : 'float', 'quantity' : 'float',
         'tax1_percent' : 'float', 'tax2_percent' : 'float', 'amount' : 'float'}
 
     def __init__(self):
@@ -373,6 +373,53 @@ class Line(BaseObject):
         for att in ('name', 'description', 'unit_cost', 'quantity', 'tax1_name',
         'tax2_name', 'tax1_percent', 'tax2_percent', 'amount'):
             setattr(self, att, None)
+
+
+#-----------------------------------------------#
+# Item
+#-----------------------------------------------#      
+class Item(BaseObject):
+    '''
+    The Item object
+    '''
+
+    TYPE_MAPPINGS = {'item_id' : 'int', 'unit_cost' : 'float',
+        'quantity' : 'int', 'inventory' : 'int'}
+
+    def __init__(self):
+        '''
+        The constructor is where we initially create the
+        attributes for this class
+        '''
+        self.name = 'item'
+        for att in ('item_id', 'name', 'description', 'unit_cost',
+        'quantity', 'inventory'):
+            setattr(self, att, None)
+
+    @classmethod
+    def get(cls, item_id):
+        '''
+        Get a single object from the API
+        '''
+        resp = call_api('item.get', {'item_id' : item_id})
+
+        if resp.success:
+            items = resp.doc.getElementsByTagName('item')
+            if items:
+                return Item._new_from_xml(items[0])
+
+        return None
+
+    @classmethod
+    def list(cls, options = {}):
+        '''  '''
+        resp = call_api('item.list', options)
+        result = None
+        if (resp.success):
+            result = [Item._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('item')]
+
+        return result
+
     
 
 #-----------------------------------------------#
