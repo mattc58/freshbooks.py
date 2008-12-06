@@ -217,8 +217,9 @@ class BaseObject(object):
         'int' : lambda val: int(val),
         'float' : lambda val: float(val),
         'bool' : lambda val: bool(int(val)) if val in ('0', '1') else val,
-        'datetime' : lambda val: datetime.datetime.strptime(val, 
-            '%Y-%m-%d %H:%M:%S') if val != '0000-00-00 00:00:00' else val
+        'datetime' : lambda val: \
+            datetime.datetime.strptime(val, 
+            '%Y-%m-%d %H:%M:%S') if (val != '0000-00-00 00:00:00' and len(val) == 19) else datetime.datetime.strptime(val, '%Y-%m-%d') if len(val) == 10 else val
     }
 
     @classmethod
@@ -320,7 +321,8 @@ class Client(BaseObject):
         resp = call_api('client.list', options)
         result = None
         if (resp.success):
-            result = [Client._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('client')]
+            result = [Client._new_from_xml(elem) for elem in \
+                resp.doc.getElementsByTagName('client')]
         
         return result
   
@@ -368,7 +370,8 @@ class Invoice(BaseObject):
         resp = call_api('invoice.list', options)
         result = None
         if (resp.success):
-            result = [Invoice._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('invoice')]
+            result = [Invoice._new_from_xml(elem) for elem in \
+                resp.doc.getElementsByTagName('invoice')]
 
         return result
         
@@ -431,7 +434,8 @@ class Item(BaseObject):
         resp = call_api('item.list', options)
         result = None
         if (resp.success):
-            result = [Item._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('item')]
+            result = [Item._new_from_xml(elem) for elem in \
+                resp.doc.getElementsByTagName('item')]
 
         return result
 
@@ -478,7 +482,8 @@ class Payment(BaseObject):
         result = None
         if (resp.success):
             print resp
-            result = [Payment._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('payment')]
+            result = [Payment._new_from_xml(elem) for elem in \
+                resp.doc.getElementsByTagName('payment')]
 
         return result
 
@@ -525,7 +530,8 @@ class Recurring(BaseObject):
         resp = call_api('recurring.list', options)
         result = None
         if (resp.success):
-            result = [Recurring._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('recurring')]
+            result = [Recurring._new_from_xml(elem) for elem in \
+                resp.doc.getElementsByTagName('recurring')]
 
         return result
     
@@ -571,7 +577,8 @@ class Project(BaseObject):
         resp = call_api('project.list', options)
         result = None
         if (resp.success):
-            result = [Project._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('project')]
+            result = [Project._new_from_xml(elem) for elem in \
+                resp.doc.getElementsByTagName('project')]
 
         return result
 
@@ -615,7 +622,53 @@ class Task(BaseObject):
         resp = call_api('task.list', options)
         result = None
         if (resp.success):
-            result = [Task._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('task')]
+            result = [Task._new_from_xml(elem) for elem in \
+                resp.doc.getElementsByTagName('task')]
+
+        return result
+
+#-----------------------------------------------#
+# TimeEntry
+#-----------------------------------------------#      
+class TimeEntry(BaseObject):
+    '''
+    The TimeEntry object
+    '''
+
+    TYPE_MAPPINGS = {'time_entry_id' : 'int', 'project_id' : 'int', 'task_id' : 'int', 'hours' : 'float', 'date' : 'datetime'}
+
+    def __init__(self):
+        '''
+        The constructor is where we initially create the
+        attributes for this class
+        '''
+        self.name = 'time_entry'
+        for att in ('time_entry_id', 'project_id', 'task_id', 'hours',
+            'notes', 'date'):
+            setattr(self, att, None)
+
+    @classmethod
+    def get(cls, timeentry_id):
+        '''
+        Get a single object from the API
+        '''
+        resp = call_api('time_entry.get', {'time_entry_id' : timeentry_id})
+
+        if resp.success:
+            timeentries = resp.doc.getElementsByTagName('time_entry')
+            if timeentries:
+                return TimeEntry._new_from_xml(timeentries[0])
+
+        return None
+
+    @classmethod
+    def list(cls, options = {}):
+        '''  '''
+        resp = call_api('time_entry.list', options)
+        result = None
+        if (resp.success):
+            result = [TimeEntry._new_from_xml(elem) for elem in \
+                resp.doc.getElementsByTagName('time_entry')]
 
         return result
 
