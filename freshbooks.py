@@ -55,7 +55,7 @@ import urllib, urllib2
 import xml.dom.minidom as xml_lib
 
 # module level constants
-VERSION = '0.1'     # Library version
+VERSION = '0.5'     # Library version
 API_VERSION = '2.1' # FreshBooks API version
 SERVICE_URL = "/api/%s/xml-in" % API_VERSION
 
