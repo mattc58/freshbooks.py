@@ -216,6 +216,7 @@ class BaseObject(object):
     MAPPING_FUNCTIONS = {
         'int' : lambda val: int(val),
         'float' : lambda val: float(val),
+        'bool' : lambda val: bool(int(val)) if val in ('0', '1') else val,
         'datetime' : lambda val: datetime.datetime.strptime(val, 
             '%Y-%m-%d %H:%M:%S') if val != '0000-00-00 00:00:00' else val
     }
@@ -332,7 +333,7 @@ class Invoice(BaseObject):
     '''
 
     TYPE_MAPPINGS = {'invoice_id' : 'int', 'client_id' : 'int',
-        'po_number' : 'float', 'discount' : 'float', 'amount' : 'float',
+        'po_number' : 'int', 'discount' : 'float', 'amount' : 'float',
         'date' : 'datetime'}
 
     def __init__(self):
@@ -559,7 +560,6 @@ class Project(BaseObject):
 
         if resp.success:
             projects = resp.doc.getElementsByTagName('project')
-            print resp
             if projects:
                 return Project._new_from_xml(projects[0])
 
@@ -571,11 +571,53 @@ class Project(BaseObject):
         resp = call_api('project.list', options)
         result = None
         if (resp.success):
-            print resp
             result = [Project._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('project')]
 
         return result
 
+#-----------------------------------------------#
+# Task
+#-----------------------------------------------#      
+class Task(BaseObject):
+    '''
+    The Task object
+    '''
+
+    TYPE_MAPPINGS = {'task_id' : 'int', 'rate' : 'float', 'billable' : 'bool'}
+
+    def __init__(self):
+        '''
+        The constructor is where we initially create the
+        attributes for this class
+        '''
+        self.name = 'task'
+        for att in ('task_id', 'name', 'billable', 'rate',
+            'description'):
+            setattr(self, att, None)
+
+    @classmethod
+    def get(cls, task_id):
+        '''
+        Get a single object from the API
+        '''
+        resp = call_api('task.get', {'task_id' : task_id})
+
+        if resp.success:
+            tasks = resp.doc.getElementsByTagName('task')
+            if tasks:
+                return Task._new_from_xml(tasks[0])
+
+        return None
+
+    @classmethod
+    def list(cls, options = {}):
+        '''  '''
+        resp = call_api('task.list', options)
+        result = None
+        if (resp.success):
+            result = [Task._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('task')]
+
+        return result
 
 #-----------------------------------------------#
 # Staff
