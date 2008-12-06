@@ -468,7 +468,6 @@ class Payment(BaseObject):
         resp = call_api('payment.get', {'payment_id' : payment_id})
 
         if resp.success:
-            print resp
             payments = resp.doc.getElementsByTagName('payment')
             if payments:
                 return Payment._new_from_xml(payments[0])
@@ -481,7 +480,6 @@ class Payment(BaseObject):
         resp = call_api('payment.list', options)
         result = None
         if (resp.success):
-            print resp
             result = [Payment._new_from_xml(elem) for elem in \
                 resp.doc.getElementsByTagName('payment')]
 
@@ -717,6 +715,52 @@ class Estimate(BaseObject):
         if (resp.success):
             result = [Estimate._new_from_xml(elem) for elem in \
                 resp.doc.getElementsByTagName('estimate')]
+
+        return result
+
+#-----------------------------------------------#
+# Expense
+#-----------------------------------------------#      
+class Expense(BaseObject):
+    '''
+    The Expense object
+    '''
+
+    TYPE_MAPPINGS = {'expense_id' : 'int', 'staff_id' : 'int',
+     'client_id' : 'int', 'category_id' : 'int', 'project_id' : 'int',
+        'amount' : 'float', 'date' : 'datetime'}
+
+    def __init__(self):
+        '''
+        The constructor is where we initially create the
+        attributes for this class
+        '''
+        self.object_name = 'expense'
+        for att in ('expense_id', 'staff_id', 'category_id', 'client_id', 'project_id', 'date', 'amount', 'notes', 'status'):
+            setattr(self, att, None)
+
+    @classmethod
+    def get(cls, expense_id):
+        '''
+        Get a single object from the API
+        '''
+        resp = call_api('expense.get', {'expense_id' : expense_id})
+
+        if resp.success:
+            expenses = resp.doc.getElementsByTagName('expense')
+            if expenses:
+                return Expense._new_from_xml(expenses[0])
+
+        return None
+
+    @classmethod
+    def list(cls, options = {}):
+        '''  '''
+        resp = call_api('expense.list', options)
+        result = None
+        if (resp.success):
+            result = [Expense._new_from_xml(elem) for elem in \
+                resp.doc.getElementsByTagName('expense')]
 
         return result
 
