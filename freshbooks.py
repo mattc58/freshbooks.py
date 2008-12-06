@@ -262,7 +262,7 @@ class BaseObject(object):
         '''
         # The root element is the class name, downcased
         element_name = element_name or \
-            self.name.lower()
+            self.object_name.lower()
         root = doc.createElement(element_name)
         
         # Add each member to the root element
@@ -297,7 +297,7 @@ class Client(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.name = 'client'
+        self.object_name = 'client'
         for att in ('client_id', 'first_name', 'last_name', 'organization','email', 'username', 'password', 'work_phone', 'home_phone', 'mobile', 'fax', 'notes', 'p_street1', 'p_street2', 'p_city', 'p_state', 'p_country', 'p_code','s_street1', 's_street2', 's_city', 's_state', 's_country', 's_code', 'url'):
             setattr(self, att, None)
         
@@ -343,7 +343,7 @@ class Invoice(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.name = 'invoice'
+        self.object_name = 'invoice'
         for att in ('invoice_id', 'client_id', 'number', 'date', 'po_number',
       'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 'p_city','p_state', 'p_country', 'p_code', 'amount', 'lines', 'discount', 'status', 'notes', 'url'):
             setattr(self, att, None)
@@ -387,7 +387,7 @@ class Line(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.name = 'line'
+        self.object_name = 'line'
         for att in ('name', 'description', 'unit_cost', 'quantity', 'tax1_name',
         'tax2_name', 'tax1_percent', 'tax2_percent', 'amount'):
             setattr(self, att, None)
@@ -409,7 +409,7 @@ class Item(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.name = 'item'
+        self.object_name = 'item'
         for att in ('item_id', 'name', 'description', 'unit_cost',
         'quantity', 'inventory'):
             setattr(self, att, None)
@@ -455,7 +455,7 @@ class Payment(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.name = 'payment'
+        self.object_name = 'payment'
         for att in ('payment_id', 'client_id', 'invoice_id', 'date',
         'amount', 'type', 'notes'):
             setattr(self, att, None)
@@ -504,7 +504,7 @@ class Recurring(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.name = 'recurring'
+        self.object_name = 'recurring'
         for att in ('recurring_id', 'client_id', 'date', 'po_number',
       'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 'p_city','p_state', 'p_country', 'p_code', 'amount', 'lines', 'discount', 'status', 'notes', 'occurrences', 'frequency', 'stopped', 'send_email', 'send_snail_mail'):
             setattr(self, att, None)
@@ -551,7 +551,7 @@ class Project(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.name = 'project'
+        self.object_name = 'project'
         for att in ('project_id', 'client_id', 'name', 'bill_method','rate',
             'description', 'tasks'):
             setattr(self, att, None)
@@ -597,7 +597,7 @@ class Task(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.name = 'task'
+        self.object_name = 'task'
         for att in ('task_id', 'name', 'billable', 'rate',
             'description'):
             setattr(self, att, None)
@@ -642,7 +642,7 @@ class TimeEntry(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.name = 'time_entry'
+        self.object_name = 'time_entry'
         for att in ('time_entry_id', 'project_id', 'task_id', 'hours',
             'notes', 'date'):
             setattr(self, att, None)
@@ -671,6 +671,54 @@ class TimeEntry(BaseObject):
                 resp.doc.getElementsByTagName('time_entry')]
 
         return result
+        
+#-----------------------------------------------#
+# Estimate
+#-----------------------------------------------#      
+class Estimate(BaseObject):
+    '''
+    The Estimate object
+    '''
+
+    TYPE_MAPPINGS = {'estimate_id' : 'int', 'client_id' : 'int',
+        'po_number' : 'int', 'discount' : 'float', 'amount' : 'float',
+        'date' : 'datetime'}
+
+    def __init__(self):
+        '''
+        The constructor is where we initially create the
+        attributes for this class
+        '''
+        self.object_name = 'estimate'
+        for att in ('estimate_id', 'client_id', 'status', 'date', 'po_number',
+      'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 'p_city','p_state', 'p_country', 'p_code', 'lines', 'discount', 'amount', 'notes'):
+            setattr(self, att, None)
+        self.lines = []
+
+    @classmethod
+    def get(cls, estimate_id):
+        '''
+        Get a single object from the API
+        '''
+        resp = call_api('estimate.get', {'estimate_id' : estimate_id})
+
+        if resp.success:
+            estimates = resp.doc.getElementsByTagName('estimate')
+            if estimates:
+                return Estimate._new_from_xml(estimates[0])
+
+        return None
+
+    @classmethod
+    def list(cls, options = {}):
+        '''  '''
+        resp = call_api('estimate.list', options)
+        result = None
+        if (resp.success):
+            result = [Estimate._new_from_xml(elem) for elem in \
+                resp.doc.getElementsByTagName('estimate')]
+
+        return result
 
 #-----------------------------------------------#
 # Staff
@@ -689,7 +737,7 @@ class Staff(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.name = 'staff'
+        self.object_name = 'staff'
         for att in ('staff_id', 'username', 'first_name', 'last_name',
         'email', 'business_phone', 'mobile_phone', 'rate', 'last_login',
         'number_of_logins', 'signup_date', 
