@@ -369,6 +369,20 @@ class Line(BaseObject):
         for att in ('name', 'description', 'unit_cost', 'quantity', 'tax1_name',
         'tax2_name', 'tax1_percent', 'tax2_percent', 'amount'):
             setattr(self, att, None)
+    
+    @classmethod
+    def get(cls, object_id, element_name = None):
+        '''
+        The Line doesn't do this
+        '''
+        raise NotImplementedError("the Line doesn't support this")
+
+    @classmethod
+    def list(cls, options = {}, element_name = None):
+        '''
+        The Line doesn't do this
+        '''
+        raise NotImplementedError("the Line doesn't support this")
 
 
 #-----------------------------------------------#
