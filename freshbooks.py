@@ -255,6 +255,21 @@ class BaseObject(object):
             
         return obj
         
+    @classmethod
+    def list(cls, options = {}, element_name = None):
+        '''  '''
+        print "on=%s" % cls.object_name
+        print "cls=%s" % cls
+        resp = call_api('%s.list' % cls.object_name, options)
+        result = None
+        if (resp.success):
+            print resp
+            result = [cls._new_from_xml(elem) for elem in \
+                resp.doc.getElementsByTagName(element_name or cls.object_name)]
+
+        return result
+        
+        
     def to_xml(self, doc, element_name=None):
         '''
         Create an XML representation of the object for use
@@ -291,13 +306,14 @@ class Client(BaseObject):
     '''
     
     TYPE_MAPPINGS = {'client_id' : 'int'}
+    object_name = 'client'
     
     def __init__(self):
         '''
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'client'
+        # self.object_name = 'client'
         for att in ('client_id', 'first_name', 'last_name', 'organization','email', 'username', 'password', 'work_phone', 'home_phone', 'mobile', 'fax', 'notes', 'p_street1', 'p_street2', 'p_city', 'p_state', 'p_country', 'p_code','s_street1', 's_street2', 's_city', 's_state', 's_country', 's_code', 'url'):
             setattr(self, att, None)
         
@@ -317,14 +333,10 @@ class Client(BaseObject):
 
     @classmethod
     def list(cls, options = {}):
-        '''  '''
-        resp = call_api('client.list', options)
-        result = None
-        if (resp.success):
-            result = [Client._new_from_xml(elem) for elem in \
-                resp.doc.getElementsByTagName('client')]
-        
-        return result
+        '''  
+        Return a list of this object
+        '''
+        return super(Client, cls).list(options)
   
 #-----------------------------------------------#
 # Invoice
@@ -334,6 +346,7 @@ class Invoice(BaseObject):
     The Invoice object
     '''
 
+    object_name = 'invoice'
     TYPE_MAPPINGS = {'invoice_id' : 'int', 'client_id' : 'int',
         'po_number' : 'int', 'discount' : 'float', 'amount' : 'float',
         'date' : 'datetime'}
@@ -343,7 +356,6 @@ class Invoice(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'invoice'
         for att in ('invoice_id', 'client_id', 'number', 'date', 'po_number',
       'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 'p_city','p_state', 'p_country', 'p_code', 'amount', 'lines', 'discount', 'status', 'notes', 'url'):
             setattr(self, att, None)
@@ -366,14 +378,10 @@ class Invoice(BaseObject):
 
     @classmethod
     def list(cls, options = {}):
-        '''  '''
-        resp = call_api('invoice.list', options)
-        result = None
-        if (resp.success):
-            result = [Invoice._new_from_xml(elem) for elem in \
-                resp.doc.getElementsByTagName('invoice')]
-
-        return result
+        '''  
+        Return a list of this object
+        '''
+        return super(Invoice, cls).list(options)
         
 #-----------------------------------------------#
 # Line--really just a part of Invoice
@@ -387,7 +395,6 @@ class Line(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'line'
         for att in ('name', 'description', 'unit_cost', 'quantity', 'tax1_name',
         'tax2_name', 'tax1_percent', 'tax2_percent', 'amount'):
             setattr(self, att, None)
@@ -401,6 +408,7 @@ class Item(BaseObject):
     The Item object
     '''
 
+    object_name = 'item'
     TYPE_MAPPINGS = {'item_id' : 'int', 'unit_cost' : 'float',
         'quantity' : 'int', 'inventory' : 'int'}
 
@@ -409,7 +417,6 @@ class Item(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'item'
         for att in ('item_id', 'name', 'description', 'unit_cost',
         'quantity', 'inventory'):
             setattr(self, att, None)
@@ -430,14 +437,10 @@ class Item(BaseObject):
 
     @classmethod
     def list(cls, options = {}):
-        '''  '''
-        resp = call_api('item.list', options)
-        result = None
-        if (resp.success):
-            result = [Item._new_from_xml(elem) for elem in \
-                resp.doc.getElementsByTagName('item')]
-
-        return result
+        '''  
+        Return a list of this object
+        '''
+        return super(Item, cls).list(options)
 
 #-----------------------------------------------#
 # Payment
@@ -446,7 +449,7 @@ class Payment(BaseObject):
     '''
     The Payment object
     '''
-
+    object_name = 'payment'
     TYPE_MAPPINGS = {'client_id' : 'int', 'invoice_id' : 'int',
         'amount' : 'float', 'date' : 'datetime'}
 
@@ -455,7 +458,6 @@ class Payment(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'payment'
         for att in ('payment_id', 'client_id', 'invoice_id', 'date',
         'amount', 'type', 'notes'):
             setattr(self, att, None)
@@ -476,14 +478,10 @@ class Payment(BaseObject):
 
     @classmethod
     def list(cls, options = {}):
-        '''  '''
-        resp = call_api('payment.list', options)
-        result = None
-        if (resp.success):
-            result = [Payment._new_from_xml(elem) for elem in \
-                resp.doc.getElementsByTagName('payment')]
-
-        return result
+        '''  
+        Return a list of this object
+        '''
+        return super(Payment, cls).list(options)
 
 #-----------------------------------------------#
 # Recurring
@@ -493,6 +491,7 @@ class Recurring(BaseObject):
     The Recurring object
     '''
 
+    object_name = 'recurring'
     TYPE_MAPPINGS = {'recurring_id' : 'int', 'client_id' : 'int',
         'po_number' : 'int', 'discount' : 'float', 'amount' : 'float',
         'occurrences' : 'int', 'date' : 'datetime'}
@@ -502,7 +501,6 @@ class Recurring(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'recurring'
         for att in ('recurring_id', 'client_id', 'date', 'po_number',
       'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 'p_city','p_state', 'p_country', 'p_code', 'amount', 'lines', 'discount', 'status', 'notes', 'occurrences', 'frequency', 'stopped', 'send_email', 'send_snail_mail'):
             setattr(self, att, None)
@@ -524,14 +522,10 @@ class Recurring(BaseObject):
 
     @classmethod
     def list(cls, options = {}):
-        '''  '''
-        resp = call_api('recurring.list', options)
-        result = None
-        if (resp.success):
-            result = [Recurring._new_from_xml(elem) for elem in \
-                resp.doc.getElementsByTagName('recurring')]
-
-        return result
+        '''  
+        Return a list of this object
+        '''
+        return super(Recurring, cls).list(options)
     
 #-----------------------------------------------#
 # Project
@@ -540,7 +534,7 @@ class Project(BaseObject):
     '''
     The Project object
     '''
-
+    object_name = 'project'
     TYPE_MAPPINGS = {'project_id' : 'int', 'client_id' : 'int',
         'rate' : 'float'}
 
@@ -571,14 +565,10 @@ class Project(BaseObject):
 
     @classmethod
     def list(cls, options = {}):
-        '''  '''
-        resp = call_api('project.list', options)
-        result = None
-        if (resp.success):
-            result = [Project._new_from_xml(elem) for elem in \
-                resp.doc.getElementsByTagName('project')]
-
-        return result
+        '''  
+        Return a list of this object
+        '''
+        return super(Project, cls).list(options)
 
 #-----------------------------------------------#
 # Task
@@ -587,7 +577,7 @@ class Task(BaseObject):
     '''
     The Task object
     '''
-
+    object_name = 'task'
     TYPE_MAPPINGS = {'task_id' : 'int', 'rate' : 'float', 'billable' : 'bool'}
 
     def __init__(self):
@@ -616,14 +606,10 @@ class Task(BaseObject):
 
     @classmethod
     def list(cls, options = {}):
-        '''  '''
-        resp = call_api('task.list', options)
-        result = None
-        if (resp.success):
-            result = [Task._new_from_xml(elem) for elem in \
-                resp.doc.getElementsByTagName('task')]
-
-        return result
+        '''  
+        Return a list of this object
+        '''
+        return super(Task, cls).list(options)
 
 #-----------------------------------------------#
 # TimeEntry
@@ -632,6 +618,7 @@ class TimeEntry(BaseObject):
     '''
     The TimeEntry object
     '''
+    object_name = 'time_entry'
 
     TYPE_MAPPINGS = {'time_entry_id' : 'int', 'project_id' : 'int', 'task_id' : 'int', 'hours' : 'float', 'date' : 'datetime'}
 
@@ -661,14 +648,10 @@ class TimeEntry(BaseObject):
 
     @classmethod
     def list(cls, options = {}):
-        '''  '''
-        resp = call_api('time_entry.list', options)
-        result = None
-        if (resp.success):
-            result = [TimeEntry._new_from_xml(elem) for elem in \
-                resp.doc.getElementsByTagName('time_entry')]
-
-        return result
+        '''  
+        Return a list of this object
+        '''
+        return super(TimeEntry, cls).list(options)
         
 #-----------------------------------------------#
 # Estimate
@@ -677,7 +660,7 @@ class Estimate(BaseObject):
     '''
     The Estimate object
     '''
-
+    object_name = 'estimate'
     TYPE_MAPPINGS = {'estimate_id' : 'int', 'client_id' : 'int',
         'po_number' : 'int', 'discount' : 'float', 'amount' : 'float',
         'date' : 'datetime'}
@@ -709,14 +692,10 @@ class Estimate(BaseObject):
 
     @classmethod
     def list(cls, options = {}):
-        '''  '''
-        resp = call_api('estimate.list', options)
-        result = None
-        if (resp.success):
-            result = [Estimate._new_from_xml(elem) for elem in \
-                resp.doc.getElementsByTagName('estimate')]
-
-        return result
+        '''  
+        Return a list of this object
+        '''
+        return super(Estimate, cls).list(options)
 
 #-----------------------------------------------#
 # Expense
@@ -725,7 +704,7 @@ class Expense(BaseObject):
     '''
     The Expense object
     '''
-
+    object_name = 'expense'
     TYPE_MAPPINGS = {'expense_id' : 'int', 'staff_id' : 'int',
      'client_id' : 'int', 'category_id' : 'int', 'project_id' : 'int',
         'amount' : 'float', 'date' : 'datetime'}
@@ -755,14 +734,10 @@ class Expense(BaseObject):
 
     @classmethod
     def list(cls, options = {}):
-        '''  '''
-        resp = call_api('expense.list', options)
-        result = None
-        if (resp.success):
-            result = [Expense._new_from_xml(elem) for elem in \
-                resp.doc.getElementsByTagName('expense')]
-
-        return result
+        '''  
+        Return a list of this object
+        '''
+        return super(Expense, cls).list(options)
 
 #-----------------------------------------------#
 # Staff
@@ -771,7 +746,7 @@ class Staff(BaseObject):
     '''
     The Staff object
     '''
-
+    object_name = 'staff'
     TYPE_MAPPINGS = {'staff_id' : 'int', 'rate' : 'float',
         'last_login' : 'datetime',
         'signup_date' : 'datetime'}
@@ -804,11 +779,8 @@ class Staff(BaseObject):
 
     @classmethod
     def list(cls, options = {}):
-        '''  '''
-        resp = call_api('staff.list', options)
-        result = None
-        if (resp.success):
-            result = [Staff._new_from_xml(elem) for elem in resp.doc.getElementsByTagName('member')]
-
-        return result
+        '''  
+        Return a list of this object
+        '''
+        return super(Staff, cls).list(options, element_name='member')
 
