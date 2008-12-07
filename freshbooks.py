@@ -256,6 +256,20 @@ class BaseObject(object):
         return obj
         
     @classmethod
+    def get(cls, object_id, element_name = None):
+        '''
+        Get a single object from the API
+        '''
+        resp = call_api('%s.get' % cls.object_name, {'%s_id' % cls.object_name : object_id})
+
+        if resp.success:
+            items = resp.doc.getElementsByTagName(element_name or cls.object_name)
+            if items:
+                return cls._new_from_xml(items[0])
+
+        return None
+        
+    @classmethod
     def list(cls, options = {}, element_name = None):
         '''  '''
         resp = call_api('%s.list' % cls.object_name, options)
@@ -314,20 +328,6 @@ class Client(BaseObject):
         for att in ('client_id', 'first_name', 'last_name', 'organization','email', 'username', 'password', 'work_phone', 'home_phone', 'mobile', 'fax', 'notes', 'p_street1', 'p_street2', 'p_city', 'p_state', 'p_country', 'p_code','s_street1', 's_street2', 's_city', 's_state', 's_country', 's_code', 'url'):
             setattr(self, att, None)
         
-    @classmethod
-    def get(cls, client_id):
-        '''
-        Get a single object from the API
-        '''
-        resp = call_api('client.get', {'client_id' : client_id})
-        
-        if resp.success:
-            clients = resp.doc.getElementsByTagName('client')
-            if clients:
-                return Client._new_from_xml(clients[0])
-        
-        return None
-
   
 #-----------------------------------------------#
 # Invoice
@@ -352,20 +352,6 @@ class Invoice(BaseObject):
             setattr(self, att, None)
         self.lines = []
         self.links = []
-
-    @classmethod
-    def get(cls, invoice_id):
-        '''
-        Get a single object from the API
-        '''
-        resp = call_api('invoice.get', {'invoice_id' : invoice_id})
-
-        if resp.success:
-            invoices = resp.doc.getElementsByTagName('invoice')
-            if invoices:
-                return Invoice._new_from_xml(invoices[0])
-
-        return None
 
         
 #-----------------------------------------------#
@@ -406,20 +392,6 @@ class Item(BaseObject):
         'quantity', 'inventory'):
             setattr(self, att, None)
 
-    @classmethod
-    def get(cls, item_id):
-        '''
-        Get a single object from the API
-        '''
-        resp = call_api('item.get', {'item_id' : item_id})
-
-        if resp.success:
-            items = resp.doc.getElementsByTagName('item')
-            if items:
-                return Item._new_from_xml(items[0])
-
-        return None
-
 
 #-----------------------------------------------#
 # Payment
@@ -441,19 +413,6 @@ class Payment(BaseObject):
         'amount', 'type', 'notes'):
             setattr(self, att, None)
 
-    @classmethod
-    def get(cls, payment_id):
-        '''
-        Get a single object from the API
-        '''
-        resp = call_api('payment.get', {'payment_id' : payment_id})
-
-        if resp.success:
-            payments = resp.doc.getElementsByTagName('payment')
-            if payments:
-                return Payment._new_from_xml(payments[0])
-
-        return None
 
 #-----------------------------------------------#
 # Recurring
@@ -478,19 +437,6 @@ class Recurring(BaseObject):
             setattr(self, att, None)
         self.lines = []
 
-    @classmethod
-    def get(cls, recurring_id):
-        '''
-        Get a single object from the API
-        '''
-        resp = call_api('recurring.get', {'recurring_id' : recurring_id})
-
-        if resp.success:
-            recurrings = resp.doc.getElementsByTagName('recurring')
-            if recurrings:
-                return Recurring._new_from_xml(recurrings[0])
-
-        return None
     
 #-----------------------------------------------#
 # Project
@@ -513,19 +459,6 @@ class Project(BaseObject):
             setattr(self, att, None)
         self.tasks = []
 
-    @classmethod
-    def get(cls, project_id):
-        '''
-        Get a single object from the API
-        '''
-        resp = call_api('project.get', {'project_id' : project_id})
-
-        if resp.success:
-            projects = resp.doc.getElementsByTagName('project')
-            if projects:
-                return Project._new_from_xml(projects[0])
-
-        return None
 
 #-----------------------------------------------#
 # Task
@@ -545,20 +478,6 @@ class Task(BaseObject):
         for att in ('task_id', 'name', 'billable', 'rate',
             'description'):
             setattr(self, att, None)
-
-    @classmethod
-    def get(cls, task_id):
-        '''
-        Get a single object from the API
-        '''
-        resp = call_api('task.get', {'task_id' : task_id})
-
-        if resp.success:
-            tasks = resp.doc.getElementsByTagName('task')
-            if tasks:
-                return Task._new_from_xml(tasks[0])
-
-        return None
 
 
 #-----------------------------------------------#
@@ -581,19 +500,6 @@ class TimeEntry(BaseObject):
             'notes', 'date'):
             setattr(self, att, None)
 
-    @classmethod
-    def get(cls, timeentry_id):
-        '''
-        Get a single object from the API
-        '''
-        resp = call_api('time_entry.get', {'time_entry_id' : timeentry_id})
-
-        if resp.success:
-            timeentries = resp.doc.getElementsByTagName('time_entry')
-            if timeentries:
-                return TimeEntry._new_from_xml(timeentries[0])
-
-        return None
         
 #-----------------------------------------------#
 # Estimate
@@ -617,19 +523,6 @@ class Estimate(BaseObject):
             setattr(self, att, None)
         self.lines = []
 
-    @classmethod
-    def get(cls, estimate_id):
-        '''
-        Get a single object from the API
-        '''
-        resp = call_api('estimate.get', {'estimate_id' : estimate_id})
-
-        if resp.success:
-            estimates = resp.doc.getElementsByTagName('estimate')
-            if estimates:
-                return Estimate._new_from_xml(estimates[0])
-
-        return None
 
 #-----------------------------------------------#
 # Expense
@@ -650,20 +543,6 @@ class Expense(BaseObject):
         '''
         for att in ('expense_id', 'staff_id', 'category_id', 'client_id', 'project_id', 'date', 'amount', 'notes', 'status'):
             setattr(self, att, None)
-
-    @classmethod
-    def get(cls, expense_id):
-        '''
-        Get a single object from the API
-        '''
-        resp = call_api('expense.get', {'expense_id' : expense_id})
-
-        if resp.success:
-            expenses = resp.doc.getElementsByTagName('expense')
-            if expenses:
-                return Expense._new_from_xml(expenses[0])
-
-        return None
 
 
 #-----------------------------------------------#
@@ -688,20 +567,6 @@ class Staff(BaseObject):
         'number_of_logins', 'signup_date', 
         'street1', 'street2', 'city', 'state', 'country', 'code'):
             setattr(self, att, None)
-
-    @classmethod
-    def get(cls, staff_id):
-        '''
-        Get a single object from the API
-        '''
-        resp = call_api('staff.get', {'staff_id' : staff_id})
-
-        if resp.success:
-            staffs = resp.doc.getElementsByTagName('staff')
-            if staffs:
-                return Staff._new_from_xml(staffs[0])
-
-        return None
 
     @classmethod
     def list(cls, options = {}):
