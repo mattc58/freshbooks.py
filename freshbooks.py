@@ -258,12 +258,9 @@ class BaseObject(object):
     @classmethod
     def list(cls, options = {}, element_name = None):
         '''  '''
-        print "on=%s" % cls.object_name
-        print "cls=%s" % cls
         resp = call_api('%s.list' % cls.object_name, options)
         result = None
         if (resp.success):
-            print resp
             result = [cls._new_from_xml(elem) for elem in \
                 resp.doc.getElementsByTagName(element_name or cls.object_name)]
 
@@ -331,12 +328,6 @@ class Client(BaseObject):
         
         return None
 
-    @classmethod
-    def list(cls, options = {}):
-        '''  
-        Return a list of this object
-        '''
-        return super(Client, cls).list(options)
   
 #-----------------------------------------------#
 # Invoice
@@ -376,12 +367,6 @@ class Invoice(BaseObject):
 
         return None
 
-    @classmethod
-    def list(cls, options = {}):
-        '''  
-        Return a list of this object
-        '''
-        return super(Invoice, cls).list(options)
         
 #-----------------------------------------------#
 # Line--really just a part of Invoice
@@ -435,12 +420,6 @@ class Item(BaseObject):
 
         return None
 
-    @classmethod
-    def list(cls, options = {}):
-        '''  
-        Return a list of this object
-        '''
-        return super(Item, cls).list(options)
 
 #-----------------------------------------------#
 # Payment
@@ -475,13 +454,6 @@ class Payment(BaseObject):
                 return Payment._new_from_xml(payments[0])
 
         return None
-
-    @classmethod
-    def list(cls, options = {}):
-        '''  
-        Return a list of this object
-        '''
-        return super(Payment, cls).list(options)
 
 #-----------------------------------------------#
 # Recurring
@@ -519,13 +491,6 @@ class Recurring(BaseObject):
                 return Recurring._new_from_xml(recurrings[0])
 
         return None
-
-    @classmethod
-    def list(cls, options = {}):
-        '''  
-        Return a list of this object
-        '''
-        return super(Recurring, cls).list(options)
     
 #-----------------------------------------------#
 # Project
@@ -543,7 +508,6 @@ class Project(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'project'
         for att in ('project_id', 'client_id', 'name', 'bill_method','rate',
             'description', 'tasks'):
             setattr(self, att, None)
@@ -563,13 +527,6 @@ class Project(BaseObject):
 
         return None
 
-    @classmethod
-    def list(cls, options = {}):
-        '''  
-        Return a list of this object
-        '''
-        return super(Project, cls).list(options)
-
 #-----------------------------------------------#
 # Task
 #-----------------------------------------------#      
@@ -585,7 +542,6 @@ class Task(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'task'
         for att in ('task_id', 'name', 'billable', 'rate',
             'description'):
             setattr(self, att, None)
@@ -604,12 +560,6 @@ class Task(BaseObject):
 
         return None
 
-    @classmethod
-    def list(cls, options = {}):
-        '''  
-        Return a list of this object
-        '''
-        return super(Task, cls).list(options)
 
 #-----------------------------------------------#
 # TimeEntry
@@ -627,7 +577,6 @@ class TimeEntry(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'time_entry'
         for att in ('time_entry_id', 'project_id', 'task_id', 'hours',
             'notes', 'date'):
             setattr(self, att, None)
@@ -645,13 +594,6 @@ class TimeEntry(BaseObject):
                 return TimeEntry._new_from_xml(timeentries[0])
 
         return None
-
-    @classmethod
-    def list(cls, options = {}):
-        '''  
-        Return a list of this object
-        '''
-        return super(TimeEntry, cls).list(options)
         
 #-----------------------------------------------#
 # Estimate
@@ -670,7 +612,6 @@ class Estimate(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'estimate'
         for att in ('estimate_id', 'client_id', 'status', 'date', 'po_number',
       'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 'p_city','p_state', 'p_country', 'p_code', 'lines', 'discount', 'amount', 'notes'):
             setattr(self, att, None)
@@ -690,13 +631,6 @@ class Estimate(BaseObject):
 
         return None
 
-    @classmethod
-    def list(cls, options = {}):
-        '''  
-        Return a list of this object
-        '''
-        return super(Estimate, cls).list(options)
-
 #-----------------------------------------------#
 # Expense
 #-----------------------------------------------#      
@@ -714,7 +648,6 @@ class Expense(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'expense'
         for att in ('expense_id', 'staff_id', 'category_id', 'client_id', 'project_id', 'date', 'amount', 'notes', 'status'):
             setattr(self, att, None)
 
@@ -732,12 +665,6 @@ class Expense(BaseObject):
 
         return None
 
-    @classmethod
-    def list(cls, options = {}):
-        '''  
-        Return a list of this object
-        '''
-        return super(Expense, cls).list(options)
 
 #-----------------------------------------------#
 # Staff
@@ -756,7 +683,6 @@ class Staff(BaseObject):
         The constructor is where we initially create the
         attributes for this class
         '''
-        self.object_name = 'staff'
         for att in ('staff_id', 'username', 'first_name', 'last_name',
         'email', 'business_phone', 'mobile_phone', 'rate', 'last_login',
         'number_of_logins', 'signup_date', 
