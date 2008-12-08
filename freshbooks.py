@@ -270,13 +270,31 @@ class BaseObject(object):
         return None
         
     @classmethod
-    def list(cls, options = {}, element_name = None):
-        '''  '''
-        resp = call_api('%s.list' % cls.object_name, options)
+    def list(cls, options = {}, element_name = None, get_all=False):
+        '''  
+        Get a summary list of this object.
+        If get_all is True then the paging will be checked to get all of the items.
+        '''
         result = None
-        if (resp.success):
-            result = [cls._new_from_xml(elem) for elem in \
-                resp.doc.getElementsByTagName(element_name or cls.object_name)]
+        if get_all:
+            options['per_page'] = 100
+            options['page'] = 1
+            objects = []
+            while True:
+                resp = call_api('%s.list' % cls.object_name, options)
+                if not resp.success:
+                    return result
+                new_objects = resp.doc.getElementsByTagName(element_name or cls.object_name)
+                objects.extend(new_objects)
+                if len(new_objects) < options['per_page']:
+                    break
+                options['page'] += 1
+            result = [cls._new_from_xml(elem) for elem in objects] 
+        else:        
+            resp = call_api('%s.list' % cls.object_name, options)
+            if (resp.success):
+                result = [cls._new_from_xml(elem) for elem in \
+                    resp.doc.getElementsByTagName(element_name or cls.object_name)]
 
         return result
         
