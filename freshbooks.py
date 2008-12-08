@@ -601,9 +601,9 @@ class Staff(BaseObject):
             setattr(self, att, None)
 
     @classmethod
-    def list(cls, options = {}):
+    def list(cls, options = {}, get_all=False):
         '''  
         Return a list of this object
         '''
-        return super(Staff, cls).list(options, element_name='member')
+        return super(Staff, cls).list(options, element_name='member', get_all=get_all)
 
