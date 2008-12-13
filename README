@@ -44,7 +44,7 @@ USAGE:
 
     import freshbooks
     
-    freshbooks.setup('YOU.freshbooks.com', '<YOUR AUTH TOKEN>')
+    freshbooks.setup('YOU.freshbooks.com', '<YOUR AUTH TOKEN>', user_agent_name='Your Company')
     clients = freshbooks.Client.list()
     client_1 = freshbooks.Client.get(<client_id>)
     
