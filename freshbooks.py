@@ -63,19 +63,28 @@ SERVICE_URL = "/api/%s/xml-in" % API_VERSION
 account_url = None
 account_name = None
 auth_token = None
+user_agent = None
 request_headers = None
 last_response = None
 
-def setup(url, token, headers={}):
+def setup(url, token, user_agent_name=None, headers={}):
     '''
     This funtion sets the high level variables for use in the interface.
     '''
-    global account_url, account_name, auth_token, request_headers
+    global account_url, account_name, auth_token, user_agent, request_headers
     
     account_url = url
-    account_name = url[(url.find('//') +2):(url.find('freshbooks.com'))]
+    if url.find('//') == -1:
+        account_name = url[:(url.find('freshbooks.com') - 1)]
+    else:
+        account_name = url[(url.find('//') + 2):(url.find('freshbooks.com') - 1)]
     auth_token = token
+    user_agent = user_agent_name
     request_headers = headers
+    if 'user-agent' not in [x.lower() for x in request_headers.keys()]:
+        if not user_agent:
+            user_agent = 'Python:%s' % account_name
+        request_headers['User-Agent'] = user_agent
     
 #  these three classes are for typed exceptions  
 class InternalError(Exception):
@@ -139,16 +148,18 @@ def post(body):
     
     # setup HTTP basic authentication
     password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-    url = "https://" + account_url + SERVICE_URL
+    url = ""
+    if account_url.find('//') == -1:
+        url = "https://"
+    url += account_url + SERVICE_URL
     password_mgr.add_password(None, url, auth_token, '')
-    if request_headers:
-        password_mgr.add_headers(request_headers)
     handler = urllib2.HTTPBasicAuthHandler(password_mgr)
     opener = urllib2.build_opener(handler)
     urllib2.install_opener(opener)    
     
     # make the request and return the response body
-    response = urllib2.urlopen(url, body)
+    request = urllib2.Request(url, body, request_headers)
+    response = urllib2.urlopen(request)
     response_content = response.read()
     return response_content
 
