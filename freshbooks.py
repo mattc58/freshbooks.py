@@ -369,7 +369,8 @@ class Invoice(BaseObject):
     object_name = 'invoice'
     TYPE_MAPPINGS = {'invoice_id' : 'int', 'client_id' : 'int',
         'po_number' : 'int', 'discount' : 'float', 'amount' : 'float',
-        'date' : 'datetime'}
+        'date' : 'datetime', 'amount_outstanding' : 'float', 
+        'paid' : 'float'}
 
     def __init__(self):
         '''
@@ -377,7 +378,9 @@ class Invoice(BaseObject):
         attributes for this class
         '''
         for att in ('invoice_id', 'client_id', 'number', 'date', 'po_number',
-      'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 'p_city','p_state', 'p_country', 'p_code', 'amount', 'lines', 'discount', 'status', 'notes', 'url'):
+      'terms', 'first_name', 'last_name', 'organization', 'p_street1', 'p_street2', 
+      'p_city','p_state', 'p_country', 'p_code', 'amount', 'amount_outstanding', 'paid', 
+      'lines', 'discount', 'status', 'notes', 'url'):
             setattr(self, att, None)
         self.lines = []
         self.links = []
@@ -587,6 +590,26 @@ class Expense(BaseObject):
         for att in ('expense_id', 'staff_id', 'category_id', 'client_id', 'project_id', 'date', 'amount', 'notes', 'status'):
             setattr(self, att, None)
 
+
+#-----------------------------------------------#
+# Category
+#-----------------------------------------------#      
+class Category(BaseObject):
+    '''
+    The Category object
+    '''
+
+    object_name = 'category'
+    TYPE_MAPPINGS = {'category_id' : 'int', 'tax1' : 'float',
+        'tax2' : 'float'}
+
+    def __init__(self):
+        '''
+        The constructor is where we initially create the
+        attributes for this class
+        '''
+        for att in ('category_id', 'name', 'tax1', 'tax2'):
+            setattr(self, att, None)
 
 #-----------------------------------------------#
 # Staff
