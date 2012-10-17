@@ -44,7 +44,15 @@ USAGE:
 
     import freshbooks
     
+    # get data
     freshbooks.setup('YOU.freshbooks.com', '<YOUR AUTH TOKEN>', user_agent_name='Your Company')
     clients = freshbooks.Client.list()
     client_1 = freshbooks.Client.get(<client_id>)
+    
+    # update data
+    changed_client = freshbooks.Client()
+    changed_client.client_id = client_1.client_id
+    changed_client.first_name = u'Jane'
+    r = freshbooks.call_api('client.update', changed_client)
+    assert(r.success)
     

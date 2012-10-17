@@ -44,9 +44,17 @@ USAGE:
 
     import freshbooks
     
+    # get data
     freshbooks.setup('YOU.freshbooks.com', '<YOUR AUTH TOKEN>')
     clients = freshbooks.Client.list()
     client_1 = freshbooks.Client.get(<client_id>)
+    
+    # update data
+    changed_client = freshbooks.Client()
+    changed_client.client_id = client_1.client_id
+    changed_client.first_name = u'Jane'
+    r = freshbooks.call_api('client.update', changed_client)
+    assert(r.success)
     
 """
 
@@ -100,7 +108,7 @@ class InvalidParameterError(Exception):
     pass
 
 
-def call_api(method, elems = []):
+def call_api(method, elems = {}):
     '''
     This function calls into the FreshBooks API and returns the Response
     '''
@@ -110,10 +118,10 @@ def call_api(method, elems = []):
     doc = xml_lib.Document()
     request = doc.createElement('request')
     request.setAttribute('method', method)
-    for key, value in elems.items():
-        if isinstance(value, BaseObject):
-            request.appendChild(value.to_xml())
-        else:
+    if isinstance(elems, BaseObject):
+        request.appendChild(elems.to_xml(doc))
+    else:
+        for key, value in elems.items():
             e = doc.createElement(key)
             e.appendChild(doc.createTextNode(str(value)))
             request.appendChild(e)
