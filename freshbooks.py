@@ -100,7 +100,7 @@ class InvalidParameterError(Exception):
     pass
 
 
-def call_api(method, elems = []):
+def call_api(method, elems = {}):
     '''
     This function calls into the FreshBooks API and returns the Response
     '''
