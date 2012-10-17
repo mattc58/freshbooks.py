@@ -112,7 +112,7 @@ def call_api(method, elems = {}):
     request.setAttribute('method', method)
     for key, value in elems.items():
         if isinstance(value, BaseObject):
-            request.appendChild(value.to_xml())
+            request.appendChild(value.to_xml(doc))
         else:
             e = doc.createElement(key)
             e.appendChild(doc.createTextNode(str(value)))
